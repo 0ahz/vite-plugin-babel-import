@@ -14,7 +14,7 @@ npm i vite-plugin-babel-import -D
 import { Button } from 'vant';
 
         ↓ ↓ ↓ ↓ ↓ ↓
-        
+
 import Button from 'vant/es/button';
 import 'vant/es/Button/index.css';
 ```
@@ -22,6 +22,8 @@ import 'vant/es/Button/index.css';
 ## Usage
 
 ```js
+// vite.config.js
+
 // ...
 import vitePluginImport from 'vite-plugin-babel-import';
 // ...
