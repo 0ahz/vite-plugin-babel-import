@@ -24,7 +24,7 @@ type ChangeCaseType =
 interface PluginInnerOption {
   libraryName: string;
   libraryResovle: (name: string) => string;
-  styleResovle: null | ((name: string) => string);
+  styleResovle: null | ((name: string) => string | null | undefined);
 }
 
 interface PluginInnerOptions extends Array<PluginInnerOption> {}
@@ -39,8 +39,9 @@ export interface PluginOption {
   libraryName: string;
   libraryDirectory?: string;
   libraryChangeCase?: ChangeCaseType | ((name: string) => string);
-  style?: (name: string) => string;
+  style?: (name: string) => string | null | undefined;
   styleChangeCase?: ChangeCaseType | ((name: string) => string);
+  ignoreStyles: string[];
 }
 
 export interface PluginOptions extends Array<PluginOption> {}
@@ -96,7 +97,12 @@ function transformOptions(options: PluginOptions): PluginInnerOptions {
         libraryPaths.push(libraryCaseFn(name));
         return libraryPaths.join('/').replace(/\/\//g, '/');
       },
-      styleResovle: opt.style ? (name) => opt.style!(styleCaseFn(name)) : null,
+      styleResovle: opt.style
+        ? (name) => {
+            if (opt.ignoreStyles?.includes(name)) return null;
+            return opt.style!(styleCaseFn(name));
+          }
+        : null,
     } as PluginInnerOption;
   });
 }
@@ -134,7 +140,10 @@ function transformSrcCode(
                 )
               );
               if (plgOpt.styleResovle) {
-                importStyles.push(plgOpt.styleResovle!(importedName));
+                let styleImpPath = plgOpt.styleResovle!(importedName);
+                if (styleImpPath) {
+                  importStyles.push(styleImpPath);
+                }
               }
             }
           });
