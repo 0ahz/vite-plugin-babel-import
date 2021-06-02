@@ -56,7 +56,7 @@ export default function vitePluginBabelImport(
       viteConfig = resolvedConfig;
     },
     transform(code, id) {
-      if (!/\.(js|jsx|vue)$/.test(id)) return;
+      if (!/\.(?:[jt]sx?|vue)$/.test(id)) return;
       return {
         code: transformSrcCode(code, transformOptions(plgOptions), viteConfig),
         map: null,
