@@ -114,7 +114,7 @@ function transformSrcCode(
 ): string {
   const ast = parser.parse(code, {
     sourceType: 'module',
-    plugins: ['jsx'],
+    plugins: ['jsx', 'typescript'],
   });
   traverse(ast, {
     enter(path) {
