@@ -41,7 +41,7 @@ export interface PluginOption {
   libraryChangeCase?: ChangeCaseType | ((name: string) => string);
   style?: (name: string) => string | null | undefined;
   styleChangeCase?: ChangeCaseType | ((name: string) => string);
-  ignoreStyles: string[];
+  ignoreStyles?: string[];
 }
 
 export interface PluginOptions extends Array<PluginOption> {}
