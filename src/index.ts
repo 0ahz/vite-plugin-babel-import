@@ -23,8 +23,8 @@ type ChangeCaseType =
 
 interface PluginInnerOption {
   libraryName: string;
-  libraryResovle: (name: string) => string;
-  styleResovle: null | ((name: string) => string | null | undefined);
+  libraryResolve: (name: string) => string;
+  styleResolve: null | ((name: string) => string | null | undefined);
 }
 
 interface PluginInnerOptions extends Array<PluginInnerOption> {}
@@ -41,7 +41,7 @@ export interface PluginOption {
   libraryChangeCase?: ChangeCaseType | ((name: string) => string);
   style?: (name: string) => string | null | undefined;
   styleChangeCase?: ChangeCaseType | ((name: string) => string);
-  ignoreStyles: string[];
+  ignoreStyles?: string[];
 }
 
 export interface PluginOptions extends Array<PluginOption> {}
@@ -89,7 +89,7 @@ function transformOptions(options: PluginOptions): PluginInnerOptions {
     }
     return {
       libraryName: opt.libraryName,
-      libraryResovle: (name) => {
+      libraryResolve: (name) => {
         let libraryPaths: string[] = [opt.libraryName];
         if (opt.libraryDirectory) {
           libraryPaths.push(opt.libraryDirectory);
@@ -97,7 +97,7 @@ function transformOptions(options: PluginOptions): PluginInnerOptions {
         libraryPaths.push(libraryCaseFn(name));
         return libraryPaths.join('/').replace(/\/\//g, '/');
       },
-      styleResovle: opt.style
+      styleResolve: opt.style
         ? (name) => {
             if (opt.ignoreStyles?.includes(name)) return null;
             return opt.style!(styleCaseFn(name));
@@ -128,7 +128,7 @@ function transformSrcCode(
           node.specifiers.forEach((spec) => {
             if (types.isImportSpecifier(spec)) {
               let importedName = (spec as Specifier).imported.name;
-              let libPath = plgOpt.libraryResovle(importedName);
+              let libPath = plgOpt.libraryResolve(importedName);
               declarations.push(
                 types.importDeclaration(
                   [
@@ -139,8 +139,8 @@ function transformSrcCode(
                   types.stringLiteral(libPath)
                 )
               );
-              if (plgOpt.styleResovle) {
-                let styleImpPath = plgOpt.styleResovle!(importedName);
+              if (plgOpt.styleResolve) {
+                let styleImpPath = plgOpt.styleResolve!(importedName);
                 if (styleImpPath) {
                   importStyles.push(styleImpPath);
                 }
